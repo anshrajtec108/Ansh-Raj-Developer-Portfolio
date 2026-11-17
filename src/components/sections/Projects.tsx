@@ -11,7 +11,7 @@ export function Projects() {
   if (featuredProjects.length === 0) return null;
 
   return (
-    <section id="projects" className="py-24 bg-card border-y border-border">
+    <section id="projects" className="section-surface py-24 bg-card border-y border-border">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -20,7 +20,7 @@ export function Projects() {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-4 mb-12">
-            <h2 className="text-sm font-mono font-bold tracking-widest uppercase text-primary">Featured Work</h2>
+            <h2 className="text-sm font-mono font-bold tracking-widest uppercase text-primary">Selected Engineering Work</h2>
             <div className="h-px bg-border flex-1" />
           </div>
 
@@ -70,9 +70,16 @@ export function Projects() {
                     )}
                   </div>
                   
-                  <Link href={`/projects/${project.slug}`} className="inline-flex items-center text-primary font-medium mt-4 hover:underline underline-offset-4">
-                    Read Case Study <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
+                  <div className="mt-4 flex flex-wrap items-center gap-5">
+                    <Link href={`/projects/${project.slug}`} className="inline-flex items-center text-primary font-medium hover:underline underline-offset-4">
+                      Read Case Study <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                    {project.githubUrl && (
+                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        Project source
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}

@@ -1,12 +1,12 @@
 import { usePortfolio } from "../../contexts/PortfolioContext";
 import { motion } from "framer-motion";
-import { MapPin, Mail, Phone, Calendar } from "lucide-react";
+import { MapPin, Mail, Phone } from "lucide-react";
 
 export function About() {
   const { data } = usePortfolio();
 
   return (
-    <section id="about" className="py-24 bg-card border-y border-border">
+    <section id="about" className="section-surface py-24 bg-card border-y border-border">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -24,12 +24,12 @@ export function About() {
           <div className="grid md:grid-cols-[2fr_1fr] gap-12 items-start">
             <div>
               <h3 className="text-3xl font-bold mb-6 text-foreground">
-                Engineering with purpose.
+                Building a strong systems foundation.
               </h3>
               <div className="prose dark:prose-invert prose-lg text-muted-foreground">
                 <p>{data.profile.summary}</p>
                 <p>
-                  I approach development as a craft. It's not just about making things work, but making them work beautifully, securely, and reliably at scale. My focus is on creating intuitive user experiences backed by robust, scalable architectures.
+                  My current direction is backend engineering, with distributed systems and AI engineering as the next areas I am exploring. I value clear trade-offs, reliable data flows, and learning by building.
                 </p>
               </div>
             </div>

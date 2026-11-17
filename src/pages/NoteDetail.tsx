@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Lightbulb, CheckCircle2, AlertTriangle, Layers } from "lucide-react";
 import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { MotionConfig, motion } from "framer-motion";
 
 export default function NoteDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -44,10 +44,11 @@ export default function NoteDetail() {
       <Navbar />
       
       <main className="flex-grow pt-32 pb-24">
+        <MotionConfig reducedMotion="user">
         <article className="container mx-auto px-6 md:px-12 max-w-4xl">
           
-          <Link href="/#engineering-notes" className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-12 font-medium">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Notes
+          <Link href="/#engineering" className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-12 font-medium">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Engineering
           </Link>
 
           <header className="mb-16">
@@ -57,7 +58,7 @@ export default function NoteDetail() {
               className="flex items-center gap-3 mb-6"
             >
               <Badge variant="secondary" className="flex items-center gap-1.5 px-3 py-1">
-                <Lightbulb className="h-4 w-4 text-primary" /> Engineering Note
+                <Lightbulb className="h-4 w-4 text-primary" /> Engineering
               </Badge>
               <div className="flex gap-2">
                 {note.tags.map(tag => (
@@ -87,6 +88,26 @@ export default function NoteDetail() {
             </motion.p>
           </header>
 
+          {note.technologies && note.technologies.length > 0 && (
+            <section aria-label="Technologies used" className="mb-12">
+              <h2 className="mb-3 text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground">Technologies used</h2>
+              <div className="flex flex-wrap gap-2">
+                {note.technologies.map(technology => (
+                  <Badge key={technology} variant="secondary">{technology}</Badge>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {note.imageUrl && (
+            <figure className="mb-16 overflow-hidden rounded-2xl border border-border bg-card">
+              <img src={note.imageUrl} alt={`${note.title} architecture diagram`} className="h-auto max-h-[34rem] w-full object-contain" />
+              <figcaption className="border-t border-border px-4 py-3 text-center text-sm text-muted-foreground">
+                Architecture and data-flow illustration for {note.title}
+              </figcaption>
+            </figure>
+          )}
+
           <div className="space-y-16">
             
             <motion.section 
@@ -100,14 +121,14 @@ export default function NoteDetail() {
                 Problem Statement
               </h2>
               <div className="prose dark:prose-invert prose-lg text-foreground whitespace-pre-wrap font-medium">
-                {note.highlight}
+                {note.problem || note.highlight}
               </div>
             </motion.section>
 
             <section>
-              <h2 className="text-3xl font-bold mb-6 text-foreground">My Thought Process</h2>
+              <h2 className="text-3xl font-bold mb-6 text-foreground">Implementation Details</h2>
               <div className="prose dark:prose-invert prose-lg text-muted-foreground whitespace-pre-wrap">
-                {note.thoughtProcess}
+                {note.implementationDetails || note.thoughtProcess}
               </div>
             </section>
 
@@ -161,9 +182,9 @@ export default function NoteDetail() {
               <div className="absolute -top-4 -left-2 bg-primary text-primary-foreground px-4 py-1 font-mono text-sm font-bold rounded-lg transform -rotate-2">
                 Selected Path
               </div>
-              <h2 className="text-2xl font-bold mb-4 text-foreground mt-2">The Final Approach</h2>
+              <h2 className="text-2xl font-bold mb-4 text-foreground mt-2">Technical Approach</h2>
               <div className="prose dark:prose-invert prose-lg text-muted-foreground whitespace-pre-wrap">
-                {note.finalApproach}
+                {note.technicalApproach || note.finalApproach}
               </div>
             </section>
 
@@ -193,15 +214,16 @@ export default function NoteDetail() {
                 </p>
               </section>
               <section>
-                <h2 className="text-xl font-bold mb-4 text-foreground">Conclusion</h2>
+                <h2 className="text-xl font-bold mb-4 text-foreground">{note.whatILearned ? "What I Learned" : "Conclusion"}</h2>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {note.conclusion}
+                  {note.whatILearned || note.conclusion}
                 </p>
               </section>
             </div>
 
           </div>
         </article>
+        </MotionConfig>
       </main>
 
       <Footer />

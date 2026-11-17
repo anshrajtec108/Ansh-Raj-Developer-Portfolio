@@ -13,6 +13,7 @@ import CertificationDetail from "@/pages/CertificationDetail";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
+import SprintTracker from "@/pages/SprintTracker";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/certifications/:slug" component={CertificationDetail} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/sprint-15" component={SprintTracker} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -33,7 +35,7 @@ function Router() {
 
 function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <PortfolioProvider>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>

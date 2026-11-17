@@ -3,8 +3,8 @@ import { PortfolioData } from '../types';
 export const seedData: PortfolioData = {
   profile: {
     name: "Ansh Raj",
-    headline: "MERN Stack Developer · Building Secure, Scalable Web Apps",
-    summary: "Dedicated MERN stack developer with a passion for building secure, scalable, and high-performance web applications. Experienced in freelancing and implementing advanced security practices. Currently pursuing BCA.",
+    headline: "Backend Engineering · Distributed Systems · AI Engineering",
+    summary: "BCA student focused on backend engineering. I build APIs and data-driven applications while deepening my understanding of concurrency, distributed systems, and AI engineering.",
     location: "Mysuru, Karnataka, India",
     email: "anshraj108.er@gmail.com",
     phone: "+91 8618009739",
@@ -37,9 +37,18 @@ export const seedData: PortfolioData = {
       category: "Backend",
       name: "Node.js & Express",
       proficiency: 85,
-      linkedProjectIds: ["p1", "p2"],
+      linkedProjectIds: ["p1", "p2", "p4"],
       linkedProofIds: ["prf2"],
       notes: "Architecting RESTful APIs, middleware pipelines, and secure authentication flows."
+    },
+    {
+      id: "s13",
+      category: "Backend",
+      name: "PostgreSQL",
+      proficiency: 65,
+      linkedProjectIds: ["p4"],
+      linkedProofIds: [],
+      notes: "Applied in APEXMATCH for transactional seat booking, wallet updates, and row-level locking."
     },
     {
       id: "s4",
@@ -70,7 +79,7 @@ export const seedData: PortfolioData = {
     },
     {
       id: "s7",
-      category: "Future Skills",
+      category: "Currently Learning",
       name: "System Design",
       proficiency: 50,
       linkedProjectIds: [],
@@ -79,15 +88,97 @@ export const seedData: PortfolioData = {
     },
     {
       id: "s8",
-      category: "Future Skills",
+      category: "Currently Learning",
       name: "Python",
       proficiency: 40,
       linkedProjectIds: [],
       linkedProofIds: [],
-      notes: "Learning Python for scripting, automation, and basic data analysis."
+      notes: "Learning Python as a foundation for backend automation and future AI engineering work."
+    },
+    {
+      id: "s9",
+      category: "Currently Learning",
+      name: "FastAPI",
+      proficiency: 25,
+      linkedProjectIds: [],
+      linkedProofIds: [],
+      notes: "Exploring Python API development; not presented as an implemented portfolio project."
+    },
+    {
+      id: "s10",
+      category: "Currently Learning",
+      name: "Redis",
+      proficiency: 25,
+      linkedProjectIds: [],
+      linkedProofIds: [],
+      notes: "Learning caching and coordination patterns. In APEXMATCH, Redis is limited to an optional health check; idempotency is not implemented."
+    },
+    {
+      id: "s11",
+      category: "Currently Learning",
+      name: "RabbitMQ",
+      proficiency: 15,
+      linkedProjectIds: [],
+      linkedProofIds: [],
+      notes: "Learning message-queue fundamentals; RabbitMQ is not implemented in APEXMATCH."
+    },
+    {
+      id: "s12",
+      category: "Currently Learning",
+      name: "AI Engineering",
+      proficiency: 15,
+      linkedProjectIds: [],
+      linkedProofIds: [],
+      notes: "An area of active learning after building a strong backend engineering foundation."
     }
   ],
   projects: [
+    {
+      id: "p4",
+      title: "APEXMATCH",
+      slug: "apexmatch",
+      shortDescription: "Ticket-booking backend built with Node.js, Express, and PostgreSQL.",
+      longOverview: "APEXMATCH is a ticket-booking backend that coordinates seat availability, bookings, and wallet transactions through a PostgreSQL-backed API. Its focus is keeping related booking and payment state consistent when requests compete for the same seat.",
+      problem: "Concurrent booking requests must not sell the same seat twice or debit a wallet without creating the matching booking.",
+      solution: "The booking flow uses PostgreSQL transactions and row-level locks to coordinate seat and wallet updates. The database is the source of truth for the booking operation.",
+      techStack: ["Node.js", "Express", "PostgreSQL", "JWT", "Redis (optional health check)"],
+      keyFeatures: [
+        "JWT authentication and role-protected admin APIs",
+        "Atomic seat booking and wallet debit in PostgreSQL transactions with row locks",
+        "Request auditing and booking metrics",
+        "A 100-request concurrency test",
+        "Optional Redis health check"
+      ],
+      securityFeatures: [
+        "JWT authentication",
+        "Role checks for administrative APIs"
+      ],
+      screenshotUrls: [],
+      challenges: "Keeping seat state, wallet balances, ledger entries, and booking records consistent within one transaction.",
+      learnings: "The booking flow reinforced how database transaction boundaries and row-level locks can protect shared state under concurrent requests.",
+      thumbnailUrl: `${import.meta.env.BASE_URL}projects/ApexMatch-Architectural.png`,
+      featured: true,
+      githubUrl: "https://lnkd.in/gP3pKuxR",
+      architectureImageUrl: `${import.meta.env.BASE_URL}projects/ApexMatch-Architectural.png`,
+      technicalDecisions: [
+        {
+          title: "PostgreSQL transactions",
+          detail: "Seat, wallet, ledger, and booking changes are grouped so the operation commits together or rolls back together."
+        },
+        {
+          title: "Row-level locking",
+          detail: "The booking flow locks the rows it needs to update, preventing conflicting requests from booking the same seat."
+        },
+        {
+          title: "Redis is optional and limited",
+          detail: "Redis is used only for an optional health check; Redis idempotency is not implemented."
+        }
+      ],
+      futureImprovements: [
+        "Add Redis-backed idempotency for retry-safe booking requests.",
+        "Consider RabbitMQ for asynchronous workflows if the system needs them."
+      ]
+    },
     {
       id: "p1",
       title: "SecureAuth Sentinel",
@@ -304,9 +395,9 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     {
       id: "en1",
       slug: "ticket-booking-system",
-      title: "Ticket Booking System (Theatre)",
-      summary: "Handling concurrent seat bookings in a high-demand environment.",
-      highlight: "Balancing user experience with strict data consistency using Redis-backed locks.",
+      title: "Ticket Booking: Reservation Design Exploration",
+      summary: "Comparing approaches to prevent double bookings in a high-demand ticketing system.",
+      highlight: "A design exploration, not a description of APEXMATCH's implementation.",
       tags: ["System Design", "Concurrency", "Backend"],
       thoughtProcess: "When designing a ticket booking system, the primary challenge is handling concurrent requests for the same seat. We need to ensure that two users cannot book the same seat simultaneously (double booking) while also maintaining a fast and responsive user experience. If a user selects a seat, we need to temporarily reserve it while they complete the payment process. If they abandon the payment, the seat should become available again. I considered several approaches ranging from strict database locks to distributed caching strategies.",
       approaches: [
@@ -332,11 +423,11 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
           cons: ["Requires managing an additional infrastructure component (Redis)", "Potential edge cases if Redis goes down"]
         }
       ],
-      finalApproach: "I chose the Redis-backed reservation with TTL (Approach 3). When a user selects a seat, we perform a `SETNX` in Redis with a 5-minute TTL. This guarantees only one user can hold the temporary reservation. Upon successful payment, we commit the final booking to the database and clear the Redis key. We also use idempotency keys during the payment step to ensure retries don't result in multiple charges.",
+      finalApproach: "As a design option, a Redis reservation with TTL could temporarily hold a seat while payment completes. This pattern is not implemented in APEXMATCH; that project uses PostgreSQL transactions and row-level locks.",
       tradeoffs: "The main trade-off is the added complexity of maintaining Redis and handling potential inconsistencies between Redis and the primary database in disaster scenarios. However, the performance benefits and the elegant handling of abandoned carts via TTL outweigh the infrastructure overhead.",
-      architectureNotes: "Client -> API Gateway -> Booking Service. Booking Service interacts with Redis for temporary locks and PostgreSQL for persistent storage. Payment Service handles external gateway interactions using idempotency keys.",
+      architectureNotes: "This note explores a possible client -> API -> booking service flow with Redis for temporary reservations and PostgreSQL for persistent storage. It is a design exploration, not an implemented APEXMATCH architecture. Redis idempotency and RabbitMQ are not implemented in APEXMATCH.",
       realWorldApplicability: "This pattern is essential for any high-contention booking scenario: movie tickets, flash sales for concerts, or limited-inventory e-commerce drops.",
-      conclusion: "Distributed locks with auto-expiration provide the best balance of speed and reliability for temporary reservation systems.",
+      conclusion: "The exercise compares trade-offs between database locking, optimistic concurrency, and temporary reservations without presenting the proposed Redis pattern as implemented work.",
       visible: true,
       order: 1
     },
@@ -378,6 +469,37 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
       conclusion: "Greedy algorithms fail at scale; true efficiency requires batching and intelligent prioritization.",
       visible: true,
       order: 2
+    },
+    {
+      id: "en3",
+      slug: "apexmatch-atomic-booking",
+      title: "APEXMATCH: Atomic ticket booking",
+      summary: "Keeping seat, wallet, and booking state consistent when requests compete for a ticket.",
+      highlight: "A seat must not be sold twice, and a wallet debit must not be separated from its booking.",
+      tags: ["Backend", "PostgreSQL", "Concurrency"],
+      thoughtProcess: "A booking is a multi-record operation: the seat changes state, the wallet is debited, a wallet transaction is recorded, and the booking is created. If one of these writes succeeds while another fails, the stored state becomes inconsistent.",
+      approaches: [
+        {
+          id: "apex-row-locking",
+          title: "Transaction with row-level locks",
+          description: "Lock the relevant seat and wallet rows while validating and applying the booking changes.",
+          pros: ["Coordinates competing updates at the database boundary", "Keeps related writes within one commit or rollback"],
+          cons: ["Locks can increase contention when many requests target the same rows"]
+        }
+      ],
+      finalApproach: "APEXMATCH groups seat booking and wallet debit in a PostgreSQL transaction and uses row locks to protect the rows involved. The flow commits all related changes together or rolls them back together.",
+      tradeoffs: "Database locking keeps the consistency rule close to the data, while requests competing for the same seat may wait. The project includes a 100-request concurrency test but does not claim a throughput benchmark.",
+      architectureNotes: "The API request passes through authentication, security headers, request auditing, validation, and business logic. PostgreSQL stores the booking state. Redis is optional for a health check only.",
+      realWorldApplicability: "The same transaction-boundary reasoning applies to inventory reservation, wallet transfers, and other workflows that update multiple related records.",
+      conclusion: "A clear transaction boundary and database-level locking provide a concrete consistency guarantee for this booking flow.",
+      visible: true,
+      order: 0,
+      problem: "Concurrent booking requests must not sell the same seat twice or debit a wallet without creating the matching booking.",
+      technicalApproach: "Use a PostgreSQL transaction and row-level locks for the seat and wallet rows involved in the booking.",
+      technologies: ["Node.js", "Express", "PostgreSQL", "JWT"],
+      implementationDetails: "The operation validates and locks the relevant rows, debits the wallet, records the wallet transaction, creates the booking, and updates the seat before committing. Failures roll back the transaction.",
+      whatILearned: "I learned to treat booking, wallet, and seat updates as one consistency boundary rather than a sequence of independent writes.",
+      imageUrl: `${import.meta.env.BASE_URL}projects/ApexMatch-Architectural.png`
     }
   ]
 };

@@ -20,7 +20,7 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { label: "Thinking", href: "/#engineering-notes" },
+    { label: "Engineering", href: "/#engineering" },
     { label: "About", href: "/#about" },
     { label: "Skills", href: "/#skills" },
     { label: "Projects", href: "/#projects" },
@@ -43,13 +43,13 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          <ul className="flex items-center gap-6">
+        <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-6">
+          <ul className="flex items-center gap-5">
             {navLinks.map((link) => (
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                 >
                   {link.label}
                 </a>
@@ -79,11 +79,12 @@ export function Navbar() {
         </nav>
 
         {/* Mobile Toggle */}
-        <div className="flex items-center gap-4 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label="Toggle color theme"
           >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -92,6 +93,9 @@ export function Navbar() {
             variant="ghost"
             size="icon"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation"
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           >
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
@@ -100,7 +104,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-background border-b border-border shadow-lg py-4 px-6 flex flex-col gap-4">
+        <nav id="mobile-navigation" aria-label="Mobile navigation" className="lg:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-md border-b border-border shadow-lg py-4 px-6 flex flex-col gap-4">
           {navLinks.map((link) => (
             <a
               key={link.label}
@@ -118,7 +122,7 @@ export function Navbar() {
               </a>
             </Button>
           )}
-        </div>
+        </nav>
       )}
     </header>
   );

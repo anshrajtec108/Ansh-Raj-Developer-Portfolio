@@ -6,7 +6,7 @@ export function Footer() {
   const { data } = usePortfolio();
   
   return (
-    <footer className="bg-card border-t border-border py-12 mt-20">
+    <footer className="bg-card border-t border-border py-8 md:py-12">
       <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex flex-col items-center md:items-start gap-2">
           <Link href="/" className="text-xl font-bold tracking-tight text-foreground">
@@ -14,9 +14,16 @@ export function Footer() {
             <span className="text-primary">.</span>
           </Link>
           <p className="text-sm text-muted-foreground text-center md:text-left max-w-xs">
-            {data.profile.headline}
+            Backend engineering, distributed systems, and AI engineering.
           </p>
         </div>
+
+        <nav aria-label="Footer navigation" className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+          <a href="/#engineering" className="hover:text-primary transition-colors">Engineering</a>
+          <a href="/#projects" className="hover:text-primary transition-colors">Projects</a>
+          <a href="/#certifications" className="hover:text-primary transition-colors">Certifications</a>
+          <a href="/#contact" className="hover:text-primary transition-colors">Contact</a>
+        </nav>
         
         <div className="flex items-center gap-6">
           <a

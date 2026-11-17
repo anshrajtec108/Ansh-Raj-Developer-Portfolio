@@ -4,12 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
+import { savePortfolioUpdate } from "@/lib/admin-save";
 
 export function ProfileEditor() {
   const { data, updateData } = usePortfolio();
-  const { toast } = useToast();
   const [profile, setProfile] = useState(data.profile);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -17,9 +16,8 @@ export function ProfileEditor() {
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    updateData({ ...data, profile });
-    toast({ title: "Profile updated", description: "Your changes have been saved." });
+  const handleSave = async () => {
+    await savePortfolioUpdate(updateData, { ...data, profile }, "Profile updated");
   };
 
   return (

@@ -11,7 +11,7 @@ export interface Profile {
   resumeUrl: string;
 }
 
-export type SkillCategory = 'Frontend' | 'Backend' | 'Tools & DevOps' | 'Future Skills';
+export type SkillCategory = 'Frontend' | 'Backend' | 'Tools & DevOps' | 'Currently Learning';
 
 export interface Skill {
   id: string;
@@ -42,6 +42,9 @@ export interface Project {
   learnings: string;
   thumbnailUrl: string;
   featured: boolean;
+  architectureImageUrl?: string;
+  technicalDecisions?: { title: string; detail: string }[];
+  futureImprovements?: string[];
 }
 
 export interface Certification {
@@ -108,6 +111,12 @@ export interface EngineeringNote {
   conclusion: string;
   visible: boolean;
   order: number;
+  problem?: string;
+  technicalApproach?: string;
+  technologies?: string[];
+  implementationDetails?: string;
+  whatILearned?: string;
+  imageUrl?: string;
 }
 
 export interface PortfolioData {

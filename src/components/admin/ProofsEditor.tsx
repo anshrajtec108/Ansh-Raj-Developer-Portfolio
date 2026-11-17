@@ -12,6 +12,7 @@ import { Proof, ProofType } from "@/types";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Link } from "wouter";
+import { savePortfolioUpdate } from "@/lib/admin-save";
 
 function TagInput({ tags, onChange, placeholder }: { tags: string[], onChange: (tags: string[]) => void, placeholder?: string }) {
   const [val, setVal] = useState("");
@@ -96,7 +97,7 @@ export function ProofsEditor() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.slug) {
       toast({ title: "Validation Error", description: "Title and slug are required.", variant: "destructive" });
       return;
@@ -115,15 +116,14 @@ export function ProofsEditor() {
       newProofs.push(formData);
     }
 
-    updateData({ ...data, proofs: newProofs });
-    setIsOpen(false);
-    toast({ title: "Proof saved successfully" });
+    if (await savePortfolioUpdate(updateData, { ...data, proofs: newProofs }, "Proof saved successfully")) {
+      setIsOpen(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const proofs = data.proofs || [];
-    updateData({ ...data, proofs: proofs.filter(p => p.id !== id) });
-    toast({ title: "Proof deleted" });
+    await savePortfolioUpdate(updateData, { ...data, proofs: proofs.filter(p => p.id !== id) }, "Proof deleted");
   };
 
   const projectOptions = data.projects.map(p => ({ label: p.title, value: p.id }));

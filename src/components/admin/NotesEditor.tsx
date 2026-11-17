@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { EngineeringNote, ApproachOption } from "@/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { savePortfolioUpdate } from "@/lib/admin-save";
 
 export function NotesEditor() {
   const { data, updateData } = usePortfolio();
@@ -33,7 +34,13 @@ export function NotesEditor() {
     realWorldApplicability: "",
     conclusion: "",
     visible: true,
-    order: (data.engineeringNotes?.length || 0) + 1
+    order: (data.engineeringNotes?.length || 0) + 1,
+    problem: "",
+    technicalApproach: "",
+    technologies: [],
+    implementationDetails: "",
+    whatILearned: "",
+    imageUrl: ""
   };
 
   const [formData, setFormData] = useState<EngineeringNote>(defaultNote);
@@ -51,7 +58,7 @@ export function NotesEditor() {
     setIsOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.summary) {
       toast({ title: "Validation Error", description: "Title and summary are required.", variant: "destructive" });
       return;
@@ -71,22 +78,21 @@ export function NotesEditor() {
       newNotes.push(noteToSave);
     }
 
-    updateData({ ...data, engineeringNotes: newNotes });
-    setIsOpen(false);
-    toast({ title: "Engineering note saved" });
+    if (await savePortfolioUpdate(updateData, { ...data, engineeringNotes: newNotes }, "Engineering note saved")) {
+      setIsOpen(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    updateData({ ...data, engineeringNotes: (data.engineeringNotes || []).filter(n => n.id !== id) });
-    toast({ title: "Engineering note deleted" });
+  const handleDelete = async (id: string) => {
+    await savePortfolioUpdate(updateData, { ...data, engineeringNotes: (data.engineeringNotes || []).filter(n => n.id !== id) }, "Engineering note deleted");
   };
 
-  const toggleVisibility = (id: string, visible: boolean) => {
+  const toggleVisibility = async (id: string, visible: boolean) => {
     const newNotes = (data.engineeringNotes || []).map(n => n.id === id ? { ...n, visible } : n);
-    updateData({ ...data, engineeringNotes: newNotes });
+    await savePortfolioUpdate(updateData, { ...data, engineeringNotes: newNotes }, null);
   };
 
-  const reorderNote = (id: string, direction: 'up' | 'down') => {
+  const reorderNote = async (id: string, direction: 'up' | 'down') => {
     const notes = [...(data.engineeringNotes || [])].sort((a, b) => a.order - b.order);
     const index = notes.findIndex(n => n.id === id);
     if (index === -1) return;
@@ -99,7 +105,7 @@ export function NotesEditor() {
       notes[index].order = notes[index + 1].order;
       notes[index + 1].order = temp;
     }
-    updateData({ ...data, engineeringNotes: notes });
+    await savePortfolioUpdate(updateData, { ...data, engineeringNotes: notes }, null);
   };
 
   const addTag = () => {
@@ -212,6 +218,38 @@ export function NotesEditor() {
               />
             </div>
 
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Problem</Label>
+                <Textarea
+                  value={formData.problem || ""}
+                  onChange={e => setFormData({ ...formData, problem: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Technologies (comma-separated)</Label>
+                <Textarea
+                  value={(formData.technologies || []).join(", ")}
+                  onChange={e => setFormData({
+                    ...formData,
+                    technologies: e.target.value.split(",").map(value => value.trim()).filter(Boolean)
+                  })}
+                  rows={3}
+                  placeholder="Node.js, PostgreSQL, ..."
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Architecture image URL (optional)</Label>
+              <Input
+                value={formData.imageUrl || ""}
+                onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                placeholder="/projects/architecture.png"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label>Highlight (Problem Statement)</Label>
               <Textarea 
@@ -229,6 +267,15 @@ export function NotesEditor() {
                 onChange={e => setFormData({...formData, thoughtProcess: e.target.value})} 
                 rows={6}
                 placeholder="How I approached this engineering problem..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Implementation Details</Label>
+              <Textarea
+                value={formData.implementationDetails || ""}
+                onChange={e => setFormData({ ...formData, implementationDetails: e.target.value })}
+                rows={4}
               />
             </div>
 
@@ -271,6 +318,15 @@ export function NotesEditor() {
               </div>
 
               <div className="space-y-2">
+                <Label>Technical Approach</Label>
+                <Textarea
+                  value={formData.technicalApproach || ""}
+                  onChange={e => setFormData({ ...formData, technicalApproach: e.target.value })}
+                  rows={4}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label>Trade-offs</Label>
                 <Textarea 
                   value={formData.tradeoffs} 
@@ -304,6 +360,15 @@ export function NotesEditor() {
                 <Textarea 
                   value={formData.conclusion} 
                   onChange={e => setFormData({...formData, conclusion: e.target.value})} 
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>What I Learned</Label>
+                <Textarea
+                  value={formData.whatILearned || ""}
+                  onChange={e => setFormData({ ...formData, whatILearned: e.target.value })}
                   rows={3}
                 />
               </div>

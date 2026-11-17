@@ -11,6 +11,7 @@ import { Certification } from "@/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Badge } from "@/components/ui/badge";
+import { savePortfolioUpdate } from "@/lib/admin-save";
 
 export function CertsEditor() {
   const { data, updateData } = usePortfolio();
@@ -53,7 +54,7 @@ export function CertsEditor() {
     setIsOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.issuer) {
       toast({ title: "Validation Error", description: "Title and issuer are required.", variant: "destructive" });
       return;
@@ -69,14 +70,13 @@ export function CertsEditor() {
       newCerts.push(certToSave);
     }
 
-    updateData({ ...data, certifications: newCerts });
-    setIsOpen(false);
-    toast({ title: "Certification saved" });
+    if (await savePortfolioUpdate(updateData, { ...data, certifications: newCerts }, "Certification saved")) {
+      setIsOpen(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    updateData({ ...data, certifications: data.certifications.filter(c => c.id !== id) });
-    toast({ title: "Certification deleted" });
+  const handleDelete = async (id: string) => {
+    await savePortfolioUpdate(updateData, { ...data, certifications: data.certifications.filter(c => c.id !== id) }, "Certification deleted");
   };
 
   const addSkill = () => {

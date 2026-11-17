@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, GitBranch, ExternalLink, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { MotionConfig, motion } from "framer-motion";
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -44,6 +44,7 @@ export default function ProjectDetail() {
       <Navbar />
       
       <main className="flex-grow pt-32 pb-24">
+        <MotionConfig reducedMotion="user">
         <article className="container mx-auto px-6 md:px-12 max-w-5xl">
           
           <Link href="/#projects" className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-12 font-medium">
@@ -58,6 +59,11 @@ export default function ProjectDetail() {
             >
               {project.title}
             </motion.h1>
+            {project.technicalDecisions && (
+              <p className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                Featured backend engineering project
+              </p>
+            )}
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -90,18 +96,24 @@ export default function ProjectDetail() {
             </motion.div>
           </header>
 
-          <motion.div 
+          <motion.figure
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="aspect-video w-full rounded-2xl overflow-hidden border border-border shadow-lg mb-20"
+            className="mb-20 overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
           >
-            <img 
-              src={project.thumbnailUrl} 
-              alt={`${project.title} interface preview`} 
-              className="w-full h-full object-cover"
+            <img
+              src={project.architectureImageUrl || project.thumbnailUrl}
+              alt={project.architectureImageUrl ? `${project.title} request flow and database architecture` : `${project.title} project preview`}
+              className="h-auto max-h-[34rem] w-full object-contain"
+              loading="eager"
             />
-          </motion.div>
+            {project.architectureImageUrl && (
+              <figcaption className="border-t border-border px-4 py-3 text-center text-sm text-muted-foreground">
+                Request flow, transaction sequence, and database relationships
+              </figcaption>
+            )}
+          </motion.figure>
 
           <div className="grid md:grid-cols-[1fr_250px] gap-16 items-start">
             
@@ -129,7 +141,9 @@ export default function ProjectDetail() {
               </div>
 
               <section>
-                <h2 className="text-2xl font-bold mb-6 text-foreground">Key Features</h2>
+                <h2 className="text-2xl font-bold mb-6 text-foreground">
+                  {project.technicalDecisions ? "Implemented Features" : "Key Features"}
+                </h2>
                 <ul className="space-y-4">
                   {project.keyFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-3">
@@ -139,6 +153,20 @@ export default function ProjectDetail() {
                   ))}
                 </ul>
               </section>
+
+              {project.technicalDecisions && (
+                <section>
+                  <h2 className="text-2xl font-bold mb-6 text-foreground">Technical Decisions</h2>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {project.technicalDecisions.map(decision => (
+                      <article key={decision.title} className="rounded-xl border border-border bg-card p-5">
+                        <h3 className="mb-2 font-semibold text-foreground">{decision.title}</h3>
+                        <p className="text-sm leading-relaxed text-muted-foreground">{decision.detail}</p>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {project.securityFeatures.length > 0 && (
                 <section className="bg-card border border-border p-8 rounded-2xl">
@@ -150,6 +178,20 @@ export default function ProjectDetail() {
                       <li key={i} className="flex items-start gap-3">
                         <div className="h-2 w-2 rounded-full bg-emerald-500 mt-2 shrink-0" />
                         <span className="text-lg text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {project.futureImprovements && project.futureImprovements.length > 0 && (
+                <section className="rounded-2xl border border-border bg-muted/40 p-6">
+                  <h2 className="mb-4 text-xl font-bold text-foreground">Possible next steps</h2>
+                  <ul className="space-y-3">
+                    {project.futureImprovements.map(improvement => (
+                      <li key={improvement} className="flex items-start gap-3 text-muted-foreground">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        {improvement}
                       </li>
                     ))}
                   </ul>
@@ -197,6 +239,7 @@ export default function ProjectDetail() {
             
           </div>
         </article>
+        </MotionConfig>
       </main>
 
       <Footer />

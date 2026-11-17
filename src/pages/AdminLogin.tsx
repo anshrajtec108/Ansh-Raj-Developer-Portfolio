@@ -10,24 +10,29 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function AdminLogin() {
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(password)) {
+    setIsSubmitting(true);
+    try {
+      await login(password);
       toast({
         title: "Access granted",
         description: "Welcome to the admin dashboard.",
       });
       setLocation("/admin");
-    } else {
+    } catch (error) {
       toast({
         title: "Access denied",
-        description: "Invalid password.",
+        description: error instanceof Error ? error.message : "Admin login failed.",
         variant: "destructive",
       });
       setPassword("");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,8 +70,8 @@ export default function AdminLogin() {
                 autoFocus
               />
             </div>
-            <Button type="submit" className="w-full h-12 font-medium text-md">
-              Unlock Dashboard
+            <Button type="submit" className="w-full h-12 font-medium text-md" disabled={isSubmitting || !password}>
+              {isSubmitting ? "Checking..." : "Unlock Dashboard"}
             </Button>
           </form>
         </CardContent>

@@ -22,10 +22,10 @@ const getProofIcon = (type: ProofType) => {
 export function Skills() {
   const { data } = usePortfolio();
 
-  const categories: SkillCategory[] = ["Frontend", "Backend", "Tools & DevOps", "Future Skills"];
+  const categories: SkillCategory[] = ["Backend", "Tools & DevOps", "Currently Learning", "Frontend"];
 
   return (
-    <section id="skills" className="py-24 bg-background">
+    <section id="skills" className="section-surface py-24 bg-background">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -54,7 +54,7 @@ export function Skills() {
                         <AccordionTrigger className="hover:no-underline hover:text-primary transition-colors">
                           <div className="flex items-center justify-between w-full pr-4">
                             <span className="font-semibold">{skill.name}</span>
-                            {category !== "Future Skills" && (
+                            {category !== "Currently Learning" && (
                               <div className="flex gap-1 h-2 w-16 bg-muted rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-primary" 

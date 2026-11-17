@@ -46,10 +46,10 @@ The platform includes sections for certifications, evidence of work, and technic
 The portfolio includes notes and articles to share technical knowledge and thought process, helping display both practical and conceptual understanding.
 
 ### 7. Admin Dashboard
-I built an admin panel with a basic password-based login. Once authenticated, I can update portfolio information and content in the browser.
+The admin panel uses server-verified password authentication, a signed HTTP-only session cookie, and server-side authorization for portfolio updates.
 
 ### 8. Data Persistence
-The portfolio stores content in browser localStorage so updates remain available in the front-end without backend setup.
+Published portfolio content is read from Supabase. The browser keeps a local cache for faster initial rendering; admin changes are saved to Supabase before the UI reports success.
 
 ### 9. Responsive Design
 The app is built to be visually appealing on desktop and mobile screens, using modern UI components and responsive styling.
@@ -64,7 +64,8 @@ The app is built to be visually appealing on desktop and mobile screens, using m
 - React Query
 - Lucide icons
 - Radix UI primitives
-- LocalStorage for data persistence
+- Supabase PostgreSQL for shared portfolio persistence
+- Browser localStorage as a public content cache
 
 ## Project Structure
 
@@ -93,17 +94,23 @@ portfolio/
 
 ## Admin Access
 
-This project includes a simple admin login for managing content.
+The admin route is `/admin/login`. Password verification, session signing, and portfolio writes run in server-side API handlers. The password and session secret must never use a `VITE_` prefix.
 
-Demo admin password:
+### Supabase setup
 
-```text
-ansh@admin
-```
+1. In Supabase SQL Editor, review and run [`supabase/migrations/20261117000000_portfolio_admin.sql`](./supabase/migrations/20261117000000_portfolio_admin.sql). It creates the portfolio content and login rate-limit tables/functions. It is additive and does not modify sprint data.
+2. Set these server environment variables locally in `.env.local` and in Vercel **Settings → Environment Variables**:
 
-You can access the admin panel through the login route in the app.
+   ```text
+   SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   SUPABASE_SECRET_KEY=your-server-only-secret-key
+   ADMIN_PASSWORD=your-unique-password-of-at-least-16-characters
+   ADMIN_SESSION_SECRET=at-least-32-random-bytes
+   ```
 
-## Local Setup
+   `SUPABASE_SECRET_KEY`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` must not have a `VITE_` prefix. Do not use the Supabase publishable key for server database operations. `.env.local` is ignored by Git; restart Vite after changing it. The Vercel values must be added to the environments that will serve the site, then redeployed.
+3. Keep the existing sprint tracker variables configured as documented below. The portfolio and tracker share server-side Supabase access but use separate API routes and session cookies.
+4. Visit `/admin/login`. The first successful admin session initializes the shared portfolio row from the current browser's cached portfolio data if no row exists. Further changes are persisted remotely and become visible to visitors/devices after refresh.
 
 ### 1. Install dependencies
 
@@ -128,6 +135,34 @@ npm run build
 ```bash
 npm run serve
 ```
+
+## Private Engineering Sprint Tracker
+
+The private tracker is available at `/sprint-15`. Its API and database access run server-side; do not add `VITE_` to any Supabase secret or session variable.
+
+### Supabase setup
+
+1. In the Supabase dashboard, open **SQL Editor**, create a new query, paste the contents of [`supabase/migrations/20261116000000_sprint_tracker.sql`](./supabase/migrations/20261116000000_sprint_tracker.sql), and run it. This creates the tracker tables, indexes, rate-limit functions, and RLS policies. The migration must succeed before the tracker can persist data.
+2. In **Project Settings → API Keys**, create/rotate a server-only secret key. Do not use the publishable key as the server database credential and do not paste secret keys into source files, commits, or chat.
+3. Keep the `.env.local` file in the project root and set:
+
+   ```text
+   SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+   SUPABASE_SECRET_KEY=your-rotated-server-secret-key
+   SPRINT_ACCESS_PIN=your-private-pin
+   SPRINT_SESSION_SECRET=at-least-32-random-bytes
+   ```
+
+   `.env.local` is ignored by Git. The Vite development server reads these values for its local server endpoints. Restart it after editing this file. `.env.example` contains placeholders only.
+
+### Vercel setup
+
+In the Vercel project, open **Settings → Environment Variables** and add the same five variables for the environments where the tracker should run. `SUPABASE_SECRET_KEY`, `SPRINT_ACCESS_PIN`, and `SPRINT_SESSION_SECRET` must remain server-only values (never use the `VITE_` prefix). Redeploy after adding or rotating values.
+
+Open `/sprint-15`, unlock with the configured PIN, and verify a saved entry remains after refresh. Test from another device to confirm shared Supabase persistence. Do not treat the tracker as connected until this round trip succeeds.
+
+Rotate the PIN or session secret by changing the corresponding environment variable and restarting/redeploying. Rotating `SPRINT_SESSION_SECRET` invalidates existing sessions. Rotate the Supabase secret in the dashboard and update the environment variable before revoking the old key.
 
 ## Deployment Guide for Beginners
 
@@ -172,10 +207,9 @@ This project includes a `vercel.json` file for SPA routing support. This helps r
 
 ## Important Notes
 
-- This portfolio works as a front-end project and is perfect for showcasing work online.
-- The admin dashboard is simple and intended for project/demo use.
-- The site is not connected to a real backend database yet.
-- The portfolio data is stored in the browser, so if a user clears browser storage, content may reset to the default seed data.
+- Public portfolio data is served by a read-only API backed by Supabase. Database writes are restricted to authenticated server-side admin handlers.
+- Do not place Supabase secret keys, admin passwords, or session secrets in client-side environment variables or source files.
+- The private sprint tracker remains a separate feature with its own migration, API routes, and session configuration.
 
 ## What I Learned While Building This Portfolio
 
@@ -195,9 +229,6 @@ This project helped me practice:
 
 Possible upgrades for the future:
 
-- Add real backend API with database
-- Connect admin panel to a secure server
-- Add authentication with encrypted passwords
 - Add contact form backend integration
 - Add CMS support
 - Add dark/light mode customization

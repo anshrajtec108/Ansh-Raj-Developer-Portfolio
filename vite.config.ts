@@ -1,7 +1,100 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import type { Connect } from "vite";
+import authHandler from "./api/sprint/auth";
+import dataHandler from "./api/sprint/data";
+import recordsHandler from "./api/sprint/records";
+import importHandler from "./api/sprint/import";
+import adminAuthHandler from "./api/admin/auth";
+import adminDataHandler from "./api/admin/data";
+import portfolioHandler from "./api/portfolio";
+import type { ApiRequest, ApiResponse } from "./api/_lib/http";
+
+function apiDevMiddleware() {
+  return {
+    name: "portfolio-api-dev-middleware",
+    configureServer(server: { middlewares: Connect.Server }) {
+      const localEnv = loadEnv("development", process.cwd(), "");
+      for (const name of [
+        "SUPABASE_URL",
+        "SUPABASE_SECRET_KEY",
+        "SPRINT_ACCESS_PIN",
+        "SPRINT_SESSION_SECRET",
+        "ADMIN_PASSWORD",
+        "ADMIN_SESSION_SECRET",
+      ]) {
+        if (!process.env[name] && localEnv[name]) process.env[name] = localEnv[name];
+      }
+      const routes = {
+        "/sprint/auth": { handler: authHandler, scope: "sprint" },
+        "/sprint/data": { handler: dataHandler, scope: "sprint" },
+        "/sprint/records": { handler: recordsHandler, scope: "sprint" },
+        "/sprint/import": { handler: importHandler, scope: "sprint" },
+        "/admin/auth": { handler: adminAuthHandler, scope: "admin" },
+        "/admin/data": { handler: adminDataHandler, scope: "admin" },
+        "/portfolio": { handler: portfolioHandler, scope: "portfolio" },
+      };
+      server.middlewares.use("/api", (req, res, next) => {
+        const pathName = (req.url ?? "").split("?")[0];
+        const route = routes[pathName as keyof typeof routes];
+        if (!route) {
+          next();
+          return;
+        }
+
+        void (async () => {
+          try {
+            const chunks: Buffer[] = [];
+            for await (const chunk of req) chunks.push(Buffer.from(chunk));
+            const rawBody = Buffer.concat(chunks).toString("utf8");
+            let body: unknown;
+            if (rawBody) {
+              try {
+                body = JSON.parse(rawBody);
+              } catch {
+                res.statusCode = 400;
+                res.setHeader("content-type", "application/json");
+                res.end(JSON.stringify({ error: "Request body must be valid JSON." }));
+                return;
+              }
+            }
+            const responseAdapter: ApiResponse = {
+              status(code) {
+                res.statusCode = code;
+                return this;
+              },
+              json(value) {
+                res.setHeader("content-type", "application/json");
+                res.end(JSON.stringify(value));
+              },
+              setHeader(name, value) {
+                res.setHeader(name, value);
+              },
+              end() {
+                res.end();
+              },
+            };
+            await route.handler({
+              method: req.method,
+              headers: req.headers,
+              socket: req.socket,
+              body,
+            } as ApiRequest, responseAdapter);
+          } catch (error) {
+            console.error(`[${route.scope}:dev-api]`, error);
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.setHeader("content-type", "application/json");
+              res.end(JSON.stringify({ error: "The tracker could not complete this request. Please retry." }));
+            }
+          }
+        })();
+      });
+    },
+  };
+}
 
 const rawPort = process.env.PORT ?? "4173";
 const port = Number(rawPort);
@@ -14,10 +107,11 @@ const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), apiDevMiddleware()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
     },
     dedupe: ["react", "react-dom"],
   },
