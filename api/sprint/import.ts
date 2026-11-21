@@ -1,6 +1,6 @@
-import { DEFAULT_ALLOCATIONS, SPRINT_END, SPRINT_ID, SPRINT_START, type Track } from "../../shared/sprint";
-import { dbRequest } from "../_lib/db";
-import { ApiRequest, ApiResponse, jsonBody, requireSession, sendError } from "../_lib/http";
+import { DEFAULT_ALLOCATIONS, SPRINT_END, SPRINT_ID, SPRINT_START, type Track } from "../../shared/sprint.js";
+import { dbRequest } from "../_lib/db.js";
+import { type ApiRequest, type ApiResponse, jsonBody, requireSession, sendError } from "../_lib/http.js";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const tracks = new Set<Track>(["backend", "ai", "dsa"]);

@@ -1,6 +1,6 @@
-import { DEFAULT_ALLOCATIONS, SPRINT_ID } from "../../shared/sprint";
-import { dbRequest } from "../_lib/db";
-import { ApiRequest, ApiResponse, requireSession, sendError } from "../_lib/http";
+import { DEFAULT_ALLOCATIONS, SPRINT_ID } from "../../shared/sprint.js";
+import { dbRequest } from "../_lib/db.js";
+import { type ApiRequest, type ApiResponse, requireSession, sendError } from "../_lib/http.js";
 
 interface DayRow {
   id: string;

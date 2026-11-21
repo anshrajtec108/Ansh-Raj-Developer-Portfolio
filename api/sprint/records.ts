@@ -1,6 +1,6 @@
-import { DEFAULT_ALLOCATIONS, SPRINT_END, SPRINT_ID, SPRINT_START, Track } from "../../shared/sprint";
-import { dbRequest } from "../_lib/db";
-import { ApiRequest, ApiResponse, jsonBody, requireSession, sendError } from "../_lib/http";
+import { DEFAULT_ALLOCATIONS, SPRINT_END, SPRINT_ID, SPRINT_START, type Track } from "../../shared/sprint.js";
+import { dbRequest } from "../_lib/db.js";
+import { type ApiRequest, type ApiResponse, jsonBody, requireSession, sendError } from "../_lib/http.js";
 
 type RecordType = "tasks" | "study_sessions" | "engineering_work" | "daily_reflections" | "sprint_days" | "recovery_events";
 type JsonRecord = Record<string, unknown>;

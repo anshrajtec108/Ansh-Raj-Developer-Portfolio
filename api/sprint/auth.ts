@@ -1,8 +1,8 @@
 import { createHmac } from "node:crypto";
-import { rpc, serverConfigIsPresent } from "../_lib/db";
+import { rpc, serverConfigIsPresent } from "../_lib/db.js";
 import {
-  ApiRequest,
-  ApiResponse,
+  type ApiRequest,
+  type ApiResponse,
   clearSessionCookie,
   clientKey,
   hasValidSession,
@@ -10,7 +10,7 @@ import {
   jsonBody,
   sameSecret,
   sendError,
-} from "../_lib/http";
+} from "../_lib/http.js";
 
 interface RateLimitResult {
   allowed: boolean;
