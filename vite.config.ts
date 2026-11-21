@@ -7,39 +7,24 @@ import authHandler from "./api/sprint/auth";
 import dataHandler from "./api/sprint/data";
 import recordsHandler from "./api/sprint/records";
 import importHandler from "./api/sprint/import";
-import adminAuthHandler from "./api/admin/auth";
-import adminDataHandler from "./api/admin/data";
-import portfolioHandler from "./api/portfolio";
 import type { ApiRequest, ApiResponse } from "./api/_lib/http";
 
-function apiDevMiddleware() {
+function sprintApiDevMiddleware() {
   return {
-    name: "portfolio-api-dev-middleware",
+    name: "sprint-api-dev-middleware",
     configureServer(server: { middlewares: Connect.Server }) {
       const localEnv = loadEnv("development", process.cwd(), "");
-      for (const name of [
-        "SUPABASE_URL",
-        "SUPABASE_SECRET_KEY",
-        "SPRINT_ACCESS_PIN",
-        "SPRINT_SESSION_SECRET",
-        "ADMIN_PASSWORD",
-        "ADMIN_SESSION_SECRET",
-      ]) {
+      for (const name of ["SUPABASE_URL", "SUPABASE_SECRET_KEY", "SPRINT_ACCESS_PIN", "SPRINT_SESSION_SECRET"]) {
         if (!process.env[name] && localEnv[name]) process.env[name] = localEnv[name];
       }
-      const routes = {
-        "/sprint/auth": { handler: authHandler, scope: "sprint" },
-        "/sprint/data": { handler: dataHandler, scope: "sprint" },
-        "/sprint/records": { handler: recordsHandler, scope: "sprint" },
-        "/sprint/import": { handler: importHandler, scope: "sprint" },
-        "/admin/auth": { handler: adminAuthHandler, scope: "admin" },
-        "/admin/data": { handler: adminDataHandler, scope: "admin" },
-        "/portfolio": { handler: portfolioHandler, scope: "portfolio" },
-      };
-      server.middlewares.use("/api", (req, res, next) => {
+      server.middlewares.use("/api/sprint", (req, res, next) => {
         const pathName = (req.url ?? "").split("?")[0];
-        const route = routes[pathName as keyof typeof routes];
-        if (!route) {
+        const handler = pathName === "/auth" ? authHandler
+          : pathName === "/data" ? dataHandler
+            : pathName === "/records" ? recordsHandler
+                : pathName === "/import" ? importHandler
+              : null;
+        if (!handler) {
           next();
           return;
         }
@@ -76,14 +61,14 @@ function apiDevMiddleware() {
                 res.end();
               },
             };
-            await route.handler({
+            await handler({
               method: req.method,
               headers: req.headers,
               socket: req.socket,
               body,
             } as ApiRequest, responseAdapter);
           } catch (error) {
-            console.error(`[${route.scope}:dev-api]`, error);
+            console.error("[sprint:dev-api]", error);
             if (!res.headersSent) {
               res.statusCode = 500;
               res.setHeader("content-type", "application/json");
@@ -107,7 +92,7 @@ const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
-  plugins: [react(), tailwindcss(), apiDevMiddleware()],
+  plugins: [react(), tailwindcss(), sprintApiDevMiddleware()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),

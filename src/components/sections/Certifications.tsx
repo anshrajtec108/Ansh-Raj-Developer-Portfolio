@@ -9,7 +9,7 @@ export function Certifications() {
   if (!data.certifications || data.certifications.length === 0) return null;
 
   return (
-    <section id="certifications" className="py-24 bg-background">
+    <section id="certifications" className="section-surface py-24 bg-background">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

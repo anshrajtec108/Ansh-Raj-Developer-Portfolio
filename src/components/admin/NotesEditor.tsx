@@ -11,7 +11,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { EngineeringNote, ApproachOption } from "@/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { savePortfolioUpdate } from "@/lib/admin-save";
 
 export function NotesEditor() {
   const { data, updateData } = usePortfolio();
@@ -58,7 +57,7 @@ export function NotesEditor() {
     setIsOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!formData.title || !formData.summary) {
       toast({ title: "Validation Error", description: "Title and summary are required.", variant: "destructive" });
       return;
@@ -78,21 +77,22 @@ export function NotesEditor() {
       newNotes.push(noteToSave);
     }
 
-    if (await savePortfolioUpdate(updateData, { ...data, engineeringNotes: newNotes }, "Engineering note saved")) {
-      setIsOpen(false);
-    }
+    updateData({ ...data, engineeringNotes: newNotes });
+    setIsOpen(false);
+    toast({ title: "Engineering note saved" });
   };
 
-  const handleDelete = async (id: string) => {
-    await savePortfolioUpdate(updateData, { ...data, engineeringNotes: (data.engineeringNotes || []).filter(n => n.id !== id) }, "Engineering note deleted");
+  const handleDelete = (id: string) => {
+    updateData({ ...data, engineeringNotes: (data.engineeringNotes || []).filter(n => n.id !== id) });
+    toast({ title: "Engineering note deleted" });
   };
 
-  const toggleVisibility = async (id: string, visible: boolean) => {
+  const toggleVisibility = (id: string, visible: boolean) => {
     const newNotes = (data.engineeringNotes || []).map(n => n.id === id ? { ...n, visible } : n);
-    await savePortfolioUpdate(updateData, { ...data, engineeringNotes: newNotes }, null);
+    updateData({ ...data, engineeringNotes: newNotes });
   };
 
-  const reorderNote = async (id: string, direction: 'up' | 'down') => {
+  const reorderNote = (id: string, direction: 'up' | 'down') => {
     const notes = [...(data.engineeringNotes || [])].sort((a, b) => a.order - b.order);
     const index = notes.findIndex(n => n.id === id);
     if (index === -1) return;
@@ -105,7 +105,7 @@ export function NotesEditor() {
       notes[index].order = notes[index + 1].order;
       notes[index + 1].order = temp;
     }
-    await savePortfolioUpdate(updateData, { ...data, engineeringNotes: notes }, null);
+    updateData({ ...data, engineeringNotes: notes });
   };
 
   const addTag = () => {

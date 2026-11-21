@@ -12,7 +12,6 @@ import { Slider } from "@/components/ui/slider";
 import { Skill, SkillCategory } from "@/types";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { savePortfolioUpdate } from "@/lib/admin-save";
 
 const CATEGORIES: SkillCategory[] = ["Backend", "Tools & DevOps", "Currently Learning", "Frontend"];
 
@@ -45,7 +44,7 @@ export function SkillsEditor() {
     setIsOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!formData.name) {
       toast({ title: "Validation Error", description: "Name is required.", variant: "destructive" });
       return;
@@ -58,16 +57,17 @@ export function SkillsEditor() {
       newSkills.push(formData);
     }
 
-    if (await savePortfolioUpdate(updateData, { ...data, skills: newSkills }, "Skill saved successfully")) {
-      setIsOpen(false);
-    }
+    updateData({ ...data, skills: newSkills });
+    setIsOpen(false);
+    toast({ title: "Skill saved successfully" });
   };
 
-  const handleDelete = async (id: string) => {
-    await savePortfolioUpdate(updateData, { ...data, skills: data.skills.filter(s => s.id !== id) }, "Skill deleted");
+  const handleDelete = (id: string) => {
+    updateData({ ...data, skills: data.skills.filter(s => s.id !== id) });
+    toast({ title: "Skill deleted" });
   };
 
-  const handleMove = async (id: string, direction: 'up' | 'down', category: SkillCategory) => {
+  const handleMove = (id: string, direction: 'up' | 'down', category: SkillCategory) => {
     const categorySkills = data.skills.filter(s => s.category === category);
     const index = categorySkills.findIndex(s => s.id === id);
     if (index < 0) return;
@@ -80,7 +80,7 @@ export function SkillsEditor() {
     [newCategorySkills[index], newCategorySkills[swapIndex]] = [newCategorySkills[swapIndex], newCategorySkills[index]];
 
     const otherSkills = data.skills.filter(s => s.category !== category);
-    await savePortfolioUpdate(updateData, { ...data, skills: [...otherSkills, ...newCategorySkills] }, null);
+    updateData({ ...data, skills: [...otherSkills, ...newCategorySkills] });
   };
 
   const projectOptions = data.projects.map(p => ({ label: p.title, value: p.id }));

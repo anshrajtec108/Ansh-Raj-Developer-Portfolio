@@ -102,9 +102,9 @@ export default function ProjectDetail() {
             transition={{ delay: 0.3 }}
             className="mb-20 overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
           >
-            <img
-              src={project.architectureImageUrl || project.thumbnailUrl}
-              alt={project.architectureImageUrl ? `${project.title} request flow and database architecture` : `${project.title} project preview`}
+            <img 
+              src={project.architectureImageUrl || project.thumbnailUrl} 
+              alt={project.architectureImageUrl ? `${project.title} request flow and database architecture` : `${project.title} project preview`} 
               className="h-auto max-h-[34rem] w-full object-contain"
               loading="eager"
             />

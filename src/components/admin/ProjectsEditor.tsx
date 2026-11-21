@@ -11,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { Project } from "@/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Link } from "wouter";
-import { savePortfolioUpdate } from "@/lib/admin-save";
 
 function TagInput({ tags, onChange, placeholder }: { tags: string[], onChange: (tags: string[]) => void, placeholder?: string }) {
   const [val, setVal] = useState("");
@@ -92,7 +91,7 @@ export function ProjectsEditor() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!formData.title || !formData.slug) {
       toast({ title: "Validation Error", description: "Title and slug are required.", variant: "destructive" });
       return;
@@ -110,13 +109,14 @@ export function ProjectsEditor() {
       newProjects.push(formData);
     }
 
-    if (await savePortfolioUpdate(updateData, { ...data, projects: newProjects }, "Project saved successfully")) {
-      setIsOpen(false);
-    }
+    updateData({ ...data, projects: newProjects });
+    setIsOpen(false);
+    toast({ title: "Project saved successfully" });
   };
 
-  const handleDelete = async (id: string) => {
-    await savePortfolioUpdate(updateData, { ...data, projects: data.projects.filter(p => p.id !== id) }, "Project deleted");
+  const handleDelete = (id: string) => {
+    updateData({ ...data, projects: data.projects.filter(p => p.id !== id) });
+    toast({ title: "Project deleted" });
   };
 
   return (
